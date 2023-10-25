@@ -46,18 +46,10 @@ def resize(request, path_name, format, url):
     statobj = os.stat(image.path)
 
     # django.views.static.was_modified_since dropped its size argument in 4.1.
-    sig = Signature(was_modified_since)
 
-    if not sig.parameters.get('size'):
-        if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                                  statobj[stat.ST_MTIME]):
-            return HttpResponseNotModified(content_type=image.mimetype)
 
-    if sig.parameters.get('size'):
-        if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
-                                  statobj[stat.ST_MTIME],
-                                  statobj[stat.ST_SIZE]):
-            return HttpResponseNotModified(content_type=image.mimetype)
+    if not was_modified_since():
+        return HttpResponseNotModified(content_type=image.mimetype)
 
     image.cached_name = request.META.get('PATH_INFO')
 
